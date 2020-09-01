@@ -10,7 +10,7 @@ conexao = pymysql.connect(
 )
 x = ' create table teste(nome varchar(50));'
 y = 'drop table teste;'
-with conexao.cursor() as cursor:
+with conexao.cursor() as cursor: ## comando que não precisa abrir e fechar cursor e conexão
     cursor.execute(x)
 
 print('saiu')
