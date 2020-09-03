@@ -27,6 +27,8 @@ def logarCadastrar():
                 elif linha['nivel'] == 2:
                     usuarioMaster = True
                 autenticado = True
+                print('autenticado !')
+                break
             else:
                 autenticado = False
 
@@ -54,9 +56,54 @@ def logarCadastrar():
 
     return autenticado, usuarioMaster
 
+def cadastrarProduto():
+    nome = input('Digite o nome do produto: ')
+    ingredientes = input('Digite os ingredientes do produto: ')
+    grupo = input('Digite o grupo pertencente a este produto: ')
+    preço = float(input('Digite o preço do produto: '))
+    try:
+        with conexao.cursor() as cursor:
+            cursor.execute('insert into produtos (nome, ingredientes, grupo, preco) values (%s, %s, %s, %s);', (nome.title(), ingredientes.title(), grupo.title(), preço))
+            conexao.commit()
+            print('Produto cadastrado com sucesso !!!')
+    except:
+        print('Não foi possível inserir informações ao banco de dados.')
+
+def listarProdutos():
+    produtos = list()
+    try:
+
+        with conexao.cursor() as cursor:
+            cursor.execute('select * from produtos')
+            mostrarprodutos = cursor.fetchall()
+
+    except:
+        print('Erro ao tentar listar produtos')
+
+    for i in mostrarprodutos:
+        produtos.append(i)
+
+    if len(produtos) != 0:
+        for y in range(0, len(produtos)):
+            print(produtos[y])
+    else:
+        print('Não há produtos cadastrados.')
+
+def excluirProdutos():
+    idDelete = int(input('Digite o ID do produto a ser excluído: '))
+    try:
+        with conexao.cursor() as cursor:
+            cursor.execute('delete from produtos where id = {}'.format(idDelete))
+            conexao.commit()
+    except:
+        print('Erro ao deletar produto do banco de dados.')
+
+    print('Produto excluído com sucesso !!!')
+
+
 
 while not autentico:
-    decisao = int(input('Digite 1 para logar ou 2 para cadastrar: '))
+    decisao = int(input('1 - logar\n2 - cadastrar\n '))
 
     try:
         with conexao.cursor() as cursor:
@@ -67,3 +114,27 @@ while not autentico:
             print('Erro ao conectar no banco de dados.')
 
     autentico, usuarioSupremo = logarCadastrar()
+
+if autentico:
+    if usuarioSupremo == True:
+        decisaoUsuario = 1
+        while decisaoUsuario != 0:
+            try:
+                decisaoUsuario = int(input('0 - sair\n1 - cadastrar\n2 - listar\n'))
+
+                if decisaoUsuario == 1:
+                    cadastrarProduto()
+                elif decisaoUsuario == 2:
+                    listarProdutos()
+                    deleteproduto = int(input('Deseja deletar algum produto ?\n1 - Sim\n0 - Não\n'))
+                    if deleteproduto == 1:
+                        excluirProdutos()
+                    else:
+                        print('Voltando a tela de menu... ')
+
+                else:
+                    print('Dígito inválido. Digite 0 para sair ou 1 para cadastrar.')
+            except:
+                print('Erro !! Tente novamente !')
+
+
