@@ -100,6 +100,46 @@ def excluirProdutos():
 
     print('Produto excluído com sucesso !!!')
 
+def listarPedidos():
+    armazenaPedidos = list()
+    decides = False
+    while not decides:
+        armazenaPedidos.clear()
+
+        try:
+            with conexao.cursor() as cursor:
+                cursor.execute('select * from pedidos')
+                pedidosList = cursor.fetchall()
+        except:
+            print('Não foi possível coletar os pedidos')
+
+        for i in pedidosList:
+            armazenaPedidos.append(i)
+
+        if len(armazenaPedidos) != 0:
+            for y in range(0, len(armazenaPedidos)):
+                print(armazenaPedidos[y])
+        else:
+            print('Não há pedidos. !')
+
+        try:
+            apagadecisao = int(input('1 - APAGAR PEDIDO\n2 - VOLTAR PARA A LISTA\n0 - VOLTAR PARA O MENU INICIAL '))
+
+            if apagadecisao == 1:
+                idDelete = input('Digite o ID do pedido que deseja apagar: ')
+                with conexao.cursor() as cursor:
+                    cursor.execute('delete from pedidos where id ={}'.format(idDelete))
+                    conexao.commit()
+                    print('Pedido apagado com sucesso !!!')
+            elif apagadecisao == 2:
+                print('Voltando para lista de pedidos ...')
+            elif apagadecisao == 0:
+                print('Voltando para tela de MENU ...')
+                decides = True
+
+        except:
+            print('Dígito inválido. Tente novamente')
+
 
 
 while not autentico:
@@ -120,7 +160,7 @@ if autentico:
         decisaoUsuario = 1
         while decisaoUsuario != 0:
             try:
-                decisaoUsuario = int(input('0 - sair\n1 - cadastrar\n2 - listar\n'))
+                decisaoUsuario = int(input('0 - sair\n1 - cadastrar produto\n2 - listar produto\n3 - listar pedido\n'))
 
                 if decisaoUsuario == 1:
                     cadastrarProduto()
@@ -131,7 +171,8 @@ if autentico:
                         excluirProdutos()
                     else:
                         print('Voltando a tela de menu... ')
-
+                elif decisaoUsuario == 3:
+                    listarPedidos()
                 else:
                     print('Dígito inválido. Digite 0 para sair ou 1 para cadastrar.')
             except:
